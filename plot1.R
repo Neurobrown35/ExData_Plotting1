@@ -1,24 +1,30 @@
-X<- rbind(x_train, x_test)
-Y<- rbind(y_train, y_test)
-Subject<- rbind(subject_train, subject_test)
-Merged_Data<- cbind(Subject, Y, X)
-TidyData <- Merged_Data %>% select(subject, code, contains("mean"), contains("std"))
-TidyData$code <- activities[TidyData$code, 2]
-names(TidyData)[2] = "activity"
-names(TidyData)<-gsub("Acc", "Accelerometer", names(TidyData))
-names(TidyData)<-gsub("Gyro", "Gyroscope", names(TidyData))
-names(TidyData)<-gsub("BodyBody", "Body", names(TidyData))
-names(TidyData)<-gsub("Mag", "Magnitude", names(TidyData))
-names(TidyData)<-gsub("^t", "Time", names(TidyData))
-names(TidyData)<-gsub("^f", "Frequency", names(TidyData))
-names(TidyData)<-gsub("tBody", "TimeBody", names(TidyData))
-names(TidyData)<-gsub("-mean()", "Mean", names(TidyData), ignore.case = TRUE)
-names(TidyData)<-gsub("-std()", "STD", names(TidyData), ignore.case = TRUE)
-names(TidyData)<-gsub("-freq()", "Frequency", names(TidyData), ignore.case = TRUE)
-names(TidyData)<-gsub("angle", "Angle", names(TidyData))
-names(TidyData)<-gsub("gravity", "Gravity", names(TidyData))
-
-FinalData <- TidyData %>%
-  group_by(subject, activity) %>%
-  summarise_all(list(mean))
-write.table(FinalData, "FinalData.txt", row.name=FALSE)
+> getwd()
+[1] "C:/Users/brown.k.4/OneDrive - Procter and Gamble/Documents"
+> setwd("C:/Users/brown.k.4/OneDrive - Procter and Gamble/Desktop/R programming Working Directory")
+> t <- read.table("household_power_consumption.txt", header=TRUE, sep=";", na.strings = "?", colClasses = c('character','character','numeric','numeric','numeric','numeric','numeric','numeric','numeric'))
+> 
+  > ## Format date to Type Date
+  > t$Date <- as.Date(t$Date, "%d/%m/%Y")
+  > 
+    > ## Filter data set from Feb. 1, 2007 to Feb. 2, 2007
+    > t <- subset(t,Date >= as.Date("2007-2-1") & Date <= as.Date("2007-2-2"))
+    > 
+      > ## Remove incomplete observation
+      > t <- t[complete.cases(t),]
+      > 
+        > ## Combine Date and Time column
+        > dateTime <- paste(t$Date, t$Time)
+        > 
+          > ## Name the vector
+          > dateTime <- setNames(dateTime, "DateTime")
+          > 
+            > ## Remove Date and Time column
+            > t <- t[ ,!(names(t) %in% c("Date","Time"))]
+            > 
+              > ## Add DateTime column
+              > t <- cbind(dateTime, t)
+              > 
+                > ## Format dateTime Column
+                > t$dateTime <- as.POSIXct(dateTime)
+                > hist(t$Global_active_power, main="Global Active Power", xlab = "Global Active Power (kilowatts)", col="red")
+                
